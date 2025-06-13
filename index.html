@@ -1,37 +1,126 @@
 <!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <title>Wasm Game of Life</title>
+    <title>Conway's Game of Life (C++ & WebAssembly)</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦠</text></svg>"
+    />
+
     <style>
-        body {
-            font-family: sans-serif;
-            text-align: center;
-            background: #222;
-            color: #eee;
-        }
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #222;
+        color: #eee;
+        margin: 0;
+        padding: 20px;
+      }
 
-        canvas {
-            border: 1px solid #ccc;
-            background: #111;
-        }
+      canvas {
+        border: 1px solid #ccc;
+        background: #111;
+        cursor: pointer;
+        /* Indicates the canvas is clickable */
+      }
+
+      button {
+        font-size: 1.2em;
+        margin: 10px;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+
+      label {
+        margin-top: 15px;
+        display: inline-block;
+      }
+
+      .rules-container {
+        margin: 40px auto;
+        padding: 10px 25px;
+        max-width: 600px;
+        border: 1px solid #444;
+        border-radius: 8px;
+        background-color: #2a2a2a;
+        text-align: left;
+      }
+
+      .rules-container h2 {
+        text-align: center;
+        color: #ddd;
+        border-bottom: 1px solid #444;
+        padding-bottom: 10px;
+      }
+
+      .rules-container ul {
+        padding-left: 20px;
+        list-style-type: square;
+      }
+
+      .rules-container li {
+        margin-bottom: 15px;
+        line-height: 1.6;
+      }
+
+      .rules-container strong {
+        color: #6fde6f;
+        font-weight: bold;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-    <h1>Conway's Game of Life (Wasm)</h1>
+  <body>
+    <h1>Conway's Game of Life</h1>
+    <p>Powered by C++ and WebAssembly</p>
+    <p>Generation: <span id="generationCount">0</span></p>
+
     <canvas id="gameCanvas"></canvas>
+
     <div>
-        <button id="startStopBtn">Start</button>
-        <button id="clearBtn">Clear</button>
+      <button id="startStopBtn">Start</button>
+      <button id="clearBtn">Clear</button>
     </div>
+
     <div>
-        <label for="speedSlider">Speed:</label>
-        <input type="range" id="speedSlider" min="10" max="500" value="200" />
+      <label for="speedSlider">Speed:</label>
+      <input type="range" id="speedSlider" min="10" max="500" value="200" />
     </div>
+
+    <p>Click on the grid to create life. Press Start to run the simulation.</p>
+
+    <div>
+      <label for="presetSelector">Load Preset:</label>
+      <select id="presetSelector">
+        <option value="none" selected>-- Select a Pattern --</option>
+        <option value="gliderGun">Gosper Glider Gun</option>
+        <option value="pulsar">Pulsar</option>
+        <option value="pentaDecathlon">Penta-decathlon</option>
+        <option value="lwss">Lightweight Spaceship</option>
+      </select>
+    </div>
+
+    <div class="rules-container">
+      <h2>The Rules of Life</h2>
+      <ul>
+        <li>
+          A <strong>living cell</strong> with <strong>two or three</strong> live
+          neighbours survives to the next generation.
+        </li>
+        <li>
+          A <strong>living cell</strong> with fewer than two or more than three
+          live neighbours <strong>dies</strong> (from under or overpopulation).
+        </li>
+        <li>
+          A <strong>dead cell</strong> with <strong>exactly three</strong> live
+          neighbours becomes a <strong>living cell</strong> (through
+          reproduction).
+        </li>
+      </ul>
+    </div>
+
     <script src="engine.js" defer></script>
     <script src="main.js" defer></script>
-</body>
-
+  </body>
 </html>

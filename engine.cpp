@@ -4,8 +4,8 @@
 
 int gridWidth;
 int gridHeight;
-
 std::vector<uint8_t> grid;
+uint32_t generation = 0;
 
 int getIdx(int r, int c) { return r * gridWidth + c; }
 
@@ -15,6 +15,7 @@ void initGrid(int width, int height) {
   gridWidth = width;
   gridHeight = height;
   grid.assign(width * height, 0);
+  generation = 0;
 }
 
 // This function returns a raw pointer to the beginning of grid data.
@@ -83,5 +84,30 @@ void nextGeneration() {
   }
 
   grid = nextGrid;
+  generation++;
+}
+
+EMSCRIPTEN_KEEPALIVE
+uint32_t getGeneration() { return generation; }
+
+EMSCRIPTEN_KEEPALIVE
+void loadPattern(uint8_t *patternData, int patternWidth, int patternHeight,
+                 int offsetX, int offsetY) {
+  // Loop through the provided pattern data
+  for (int r = 0; r < patternHeight; ++r) {
+    for (int c = 0; c < patternWidth; ++c) {
+      // Calculate the target coordinates on the main grid
+      int targetRow = offsetY + r;
+      int targetCol = offsetX + c;
+
+      // Make sure the target is within bounds
+      if (targetRow >= 0 && targetRow < gridHeight && targetCol >= 0 &&
+          targetCol < gridWidth) {
+        // Get the value from the 1D pattern array
+        uint8_t value = patternData[r * patternWidth + c];
+        grid[getIdx(targetRow, targetCol)] = value;
+      }
+    }
+  }
 }
 } // end of extern "C"

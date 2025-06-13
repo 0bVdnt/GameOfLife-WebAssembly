@@ -1,9 +1,13 @@
+// --- DOM Elements ---
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const startStopBtn = document.getElementById('startStopBtn');
 const clearBtn = document.getElementById('clearBtn');
 const speedSlider = document.getElementById('speedSlider');
+const generationCountSpan = document.getElementById('generationCount');
+const presetSelector = document.getElementById('presetSelector');
 
+// --- Game State & Constants ---
 const gameState = {
     isRunning: false,
     animationFrameId: null,
@@ -11,10 +15,67 @@ const gameState = {
     updateInterval: 510 - parseInt(speedSlider.value, 10),
 };
 
+// --- Canvas Setup ---
 const GRID_WIDTH = 60;
 const GRID_HEIGHT = 40;
 const CELL_SIZE = 12; // Size of each cell in pixels
 
+// --- Preset Pattern Data ---
+const presets = {
+    gliderGun: {
+        width: 36, height: 9,
+        pattern: new Uint8Array([ // Using Uint8Array is slightly more explicit
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,
+            0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,
+            0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+            1,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,
+            1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        ])
+    },
+    pulsar: {
+        width: 17, height: 17,
+        pattern: new Uint8Array([
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+            0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,
+            0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,
+            0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,
+            0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,
+            0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,
+            0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,
+            0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        ])
+    },
+    pentaDecathlon: {
+        width: 10, height: 3,
+        pattern: new Uint8Array([
+            0,0,1,0,0,0,0,1,0,0,
+            1,1,0,1,1,1,1,0,1,1,
+            0,0,1,0,0,0,0,1,0,0,
+        ])
+    },
+    lwss: {
+        width: 5, height: 4,
+        pattern: new Uint8Array([
+            0,1,0,0,1,
+            1,0,0,0,0,
+            1,0,0,0,1,
+            1,1,1,1,0,
+        ])
+    },
+};
 canvas.width = GRID_WIDTH * CELL_SIZE;
 canvas.height = GRID_HEIGHT * CELL_SIZE;
 
@@ -26,6 +87,8 @@ Module.onRuntimeInitialized = () => {
     const getGridPtr = Module.cwrap('getGridPtr', 'number', []);
     const setCell = Module.cwrap('setCell', null, ['number', 'number']);
     const nextGeneration = Module.cwrap('nextGeneration', null, []);
+    const getGeneration = Module.cwrap('getGeneration', 'number', []);
+    const loadPattern = Module.cwrap('loadPattern', null, ['number', 'number', 'number', 'number', 'number']);
 
     // This function reads the grid from Wasm memory and draws it to the canvas
     function drawGrid() {
@@ -59,6 +122,7 @@ Module.onRuntimeInitialized = () => {
         }
     }
     
+    // --- The Game Loop ---
     function gameLoop(currentTime) {
         if (!gameState.isRunning)
             return;
@@ -66,24 +130,26 @@ Module.onRuntimeInitialized = () => {
         const del = currentTime - gameState.lastUpdateTime;
         if (del > gameState.updateInterval) {
             nextGeneration();
+            generationCountSpan.textContent = getGeneration();
             gameState.lastUpdateTime = currentTime;
         }
         drawGrid();
     }
 
+    // --- Control Functions ---
     function startSimulation() {
         gameState.isRunning = true;
         startStopBtn.textContent = 'Stop';
         gameState.lastUpdateTime = performance.now();
         requestAnimationFrame(gameLoop);
     }
-
     function stopSimulation() {
         gameState.isRunning = false;
         startStopBtn.textContent = 'Start';
         cancelAnimationFrame(gameState.animationFrameId);
     }
 
+    // --- Event Listeners ---
     startStopBtn.addEventListener('click', () => {
         if (gameState.isRunning) {
             stopSimulation();
@@ -97,6 +163,7 @@ Module.onRuntimeInitialized = () => {
         stopSimulation();
         // Then reset the grid state in C++.
         initGrid(GRID_WIDTH, GRID_HEIGHT);
+        generationCountSpan.textContent = "0";
         // And finally, update the view to show the empty grid.
         drawGrid();
     }); 
@@ -126,11 +193,36 @@ Module.onRuntimeInitialized = () => {
         gameState.updateInterval = 510 - parseInt(event.target.value, 10);
     });
 
-    initGrid(GRID_WIDTH, GRID_HEIGHT);
+    presetSelector.addEventListener('change', (event) => {
+        const patternName = event.target.value;
+        if (patternName === "none") return;
 
-    setCell(10, 10);
-    setCell(10, 11);
-    setCell(10, 12);
-    
+        const preset = presets[patternName];
+        if (!preset) return;
+
+        stopSimulation(); // Stop simulation before loading a new pattern
+        initGrid(GRID_WIDTH, GRID_HEIGHT); // Clear the grid
+        // We use the constructor's property: Uint8Array.BYTES_PER_ELEMENT
+        const bufferSize = preset.pattern.length * Uint8Array.BYTES_PER_ELEMENT;
+        const patternPtr = Module._malloc(bufferSize);
+        // Allocate memory inside the Wasm module for the pattern
+        // Copy the pattern data from JS into that Wasm memory
+        Module.HEAPU8.set(preset.pattern, patternPtr);
+
+        const offsetX = Math.floor((GRID_WIDTH - preset.width) / 2);
+        const offsetY = Math.floor((GRID_HEIGHT - preset.height) / 2);
+        // Call the C++ function to load the pattern from Wasm memory
+        loadPattern(patternPtr, preset.width, preset.height, offsetX, offsetY); // Place with an offset
+
+        // Free the memory allocated in Wasm
+        Module._free(patternPtr);
+        
+        generationCountSpan.textContent = "0";
+        drawGrid();
+        presetSelector.value = "none"; // Reset dropdown
+    });
+
+    // --- Initial Page Load ---
+    initGrid(GRID_WIDTH, GRID_HEIGHT);
     drawGrid();
 };

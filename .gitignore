@@ -1,0 +1,59 @@
+# ==================================
+# C++ / General Compilation
+# ==================================
+# Executables
+*.exe
+*.out
+*.app
+game_of_life
+
+# Object files
+*.o
+*.obj
+*.o.d
+
+# Libraries
+*.a
+*.so
+*.lib
+*.dll
+
+
+# ==================================
+# WebAssembly / Emscripten Output
+# ==================================
+# Compiled JavaScript loader and Wasm binary
+engine.js
+engine.wasm
+
+
+# ==================================
+# Python
+# ==================================
+# Virtual Environment directory
+.venv/
+venv/
+**/venv/
+**/__pycache__/
+*.pyc
+
+
+# ==================================
+# OS / Editor specific
+# ==================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+
+# Visual Studio Code
+.vscode/
+
+# CLion / JetBrains
+.idea/

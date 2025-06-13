@@ -240,13 +240,6 @@ function assert(condition, text) {
 
 // We used to include malloc/free by default in the past. Show a helpful error in
 // builds with assertions.
-function _malloc() {
-  abort('malloc() called but not included in the build - add `_malloc` to EXPORTED_FUNCTIONS');
-}
-function _free() {
-  // Show a helpful error since we used to include free by default in the past.
-  abort('free() called but not included in the build - add `_free` to EXPORTED_FUNCTIONS');
-}
 
 /**
  * Indicates whether filename is delivered via file protocol (as opposed to http/https)
@@ -1725,8 +1718,12 @@ var _initGrid = Module['_initGrid'] = makeInvalidEarlyAccess('_initGrid');
 var _getGridPtr = Module['_getGridPtr'] = makeInvalidEarlyAccess('_getGridPtr');
 var _setCell = Module['_setCell'] = makeInvalidEarlyAccess('_setCell');
 var _nextGeneration = Module['_nextGeneration'] = makeInvalidEarlyAccess('_nextGeneration');
+var _getGeneration = Module['_getGeneration'] = makeInvalidEarlyAccess('_getGeneration');
+var _loadPattern = Module['_loadPattern'] = makeInvalidEarlyAccess('_loadPattern');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _strerror = makeInvalidEarlyAccess('_strerror');
+var _malloc = Module['_malloc'] = makeInvalidEarlyAccess('_malloc');
+var _free = Module['_free'] = makeInvalidEarlyAccess('_free');
 var _emscripten_stack_init = makeInvalidEarlyAccess('_emscripten_stack_init');
 var _emscripten_stack_get_free = makeInvalidEarlyAccess('_emscripten_stack_get_free');
 var _emscripten_stack_get_base = makeInvalidEarlyAccess('_emscripten_stack_get_base');
@@ -1740,8 +1737,12 @@ function assignWasmExports(wasmExports) {
   Module['_getGridPtr'] = _getGridPtr = createExportWrapper('getGridPtr', 0);
   Module['_setCell'] = _setCell = createExportWrapper('setCell', 2);
   Module['_nextGeneration'] = _nextGeneration = createExportWrapper('nextGeneration', 0);
+  Module['_getGeneration'] = _getGeneration = createExportWrapper('getGeneration', 0);
+  Module['_loadPattern'] = _loadPattern = createExportWrapper('loadPattern', 5);
   _fflush = createExportWrapper('fflush', 1);
   _strerror = createExportWrapper('strerror', 1);
+  Module['_malloc'] = _malloc = createExportWrapper('malloc', 1);
+  Module['_free'] = _free = createExportWrapper('free', 1);
   _emscripten_stack_init = wasmExports['emscripten_stack_init'];
   _emscripten_stack_get_free = wasmExports['emscripten_stack_get_free'];
   _emscripten_stack_get_base = wasmExports['emscripten_stack_get_base'];
