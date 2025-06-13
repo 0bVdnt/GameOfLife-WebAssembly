@@ -1724,6 +1724,7 @@ function checkIncomingModuleAPI() {
 var _initGrid = Module['_initGrid'] = makeInvalidEarlyAccess('_initGrid');
 var _getGridPtr = Module['_getGridPtr'] = makeInvalidEarlyAccess('_getGridPtr');
 var _setCell = Module['_setCell'] = makeInvalidEarlyAccess('_setCell');
+var _nextGeneration = Module['_nextGeneration'] = makeInvalidEarlyAccess('_nextGeneration');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _strerror = makeInvalidEarlyAccess('_strerror');
 var _emscripten_stack_init = makeInvalidEarlyAccess('_emscripten_stack_init');
@@ -1738,6 +1739,7 @@ function assignWasmExports(wasmExports) {
   Module['_initGrid'] = _initGrid = createExportWrapper('initGrid', 2);
   Module['_getGridPtr'] = _getGridPtr = createExportWrapper('getGridPtr', 0);
   Module['_setCell'] = _setCell = createExportWrapper('setCell', 2);
+  Module['_nextGeneration'] = _nextGeneration = createExportWrapper('nextGeneration', 0);
   _fflush = createExportWrapper('fflush', 1);
   _strerror = createExportWrapper('strerror', 1);
   _emscripten_stack_init = wasmExports['emscripten_stack_init'];

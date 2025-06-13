@@ -23,10 +23,13 @@
     <h1>Conway's Game of Life (Wasm)</h1>
     <canvas id="gameCanvas"></canvas>
     <div>
-        <button>Start</button>
-        <button>Clear</button>
+        <button id="startStopBtn">Start</button>
+        <button id="clearBtn">Clear</button>
     </div>
-
+    <div>
+        <label for="speedSlider">Speed:</label>
+        <input type="range" id="speedSlider" min="10" max="500" value="200" />
+    </div>
     <script src="engine.js" defer></script>
     <script src="main.js" defer></script>
 </body>
