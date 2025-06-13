@@ -48,6 +48,24 @@ Module.onRuntimeInitialized = () => {
         }
     }
 
+    canvas.addEventListener('click', (event) => {
+        // Get the bounding rectangle of the canvas.
+        const rect =  canvas.getBoundingClientRect();
+
+        // Mouse coords relative to the canvas
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        // Convert the pixel coordinates to grid cell coordinates.
+        const col = Math.floor(x / CELL_SIZE);
+        const row = Math.floor(y / CELL_SIZE);
+
+        // Call the C++ function to toggle the state of the cell 
+        setCell(row, col);
+
+        // Redraw the grid
+        drawGrid();
+    })
     initGrid(GRID_WIDTH, GRID_HEIGHT);
 
     setCell(10, 10);

@@ -16,6 +16,7 @@ void initGrid(int width, int height) {
   gridHeight = height;
   grid.assign(width * height, 0);
 }
+
 // This function returns a raw pointer to the beginning of grid data.
 // JavaScript will use this pointer to read the grid state directly from Wasm
 // memory.
@@ -25,10 +26,14 @@ uint8_t *getGridPtr() {
   // efficient.
   return grid.data();
 }
+
 EMSCRIPTEN_KEEPALIVE
 void setCell(int r, int c) {
   if (r >= 0 && r < gridHeight && c >= 0 && c < gridWidth) {
-    grid[getIdx(r, c)] = 1;
+    int index = getIdx(r, c);
+    // This is the toggle logic. If the cell is 1, it becomes 0.
+    // If it's 0, it becomes 1.
+    grid[index] = !grid[index];
   }
 }
 } // end of extern "C"
