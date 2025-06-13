@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Wasm Game of Life</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            background: #222;
+            color: #eee;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            background: #111;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Conway's Game of Life (Wasm)</h1>
+    <canvas id="gameCanvas"></canvas>
+    <div>
+        <button>Start</button>
+        <button>Clear</button>
+    </div>
+
+    <script src="engine.js" defer></script>
+    <script src="main.js" defer></script>
+</body>
+
+</html>
